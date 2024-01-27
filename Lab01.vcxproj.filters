@@ -27,7 +27,7 @@
     <ClCompile Include="uiInteract.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="testEnPasssant.cpp">
+    <ClCompile Include="MyTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClInclude Include="uiInteract.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="testEnPasssant.h">
+    <ClInclude Include="MyTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
