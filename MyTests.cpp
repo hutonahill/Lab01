@@ -1,5 +1,6 @@
 #include "MyTests.h"
 #include<set>
+#include <iostream>
 #include"chess.cpp"
 
 
@@ -37,7 +38,7 @@ void MyTests::testPawnPromotion()
         char lastRowPawn = board[56]; // Assuming last row index is 56
         if (lastRowPawn != ' ' && ((pawnPosition < 16 && lastRowPawn >= 'a') || (pawnPosition >= 48 && lastRowPawn <= 'Z')))
         {
-            std::cerr << "Error: Pawn in the last row not promoted!" << std::endl;
+            cout << "Error: Pawn in the last row not promoted!" << std::endl;
             return;
         }
     }
