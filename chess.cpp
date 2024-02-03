@@ -11,6 +11,7 @@
 #include <fstream>        // for IFSTREAM
 #include <string>         // for STRING
 #include <tuple>
+#include<iostream>
 using namespace std;
 
 const char emptySpace = ' ';
@@ -416,44 +417,42 @@ void draw(const char* board, const Interface & ui, const set <int> & possible)
    for (int i = 0; i < 64; i++)
           switch (board[i])
           {
-          case 'P':
+          case whitePawn:
              gout.drawPawn(i, true);
              break;
-          case 'p':
+          case blackPawn:
              gout.drawPawn(i, false);
              break;
           
-          // Ive changed kings to be drawn as queans
-          case 'K':
-             gout.drawQueen(i, true);
+          case whiteKing:
+             gout.drawKing(i, true);
              break;
-          case 'k':
-             gout.drawQueen(i, false);
+          case blackKing:
+             gout.drawKing(i, false);
              break;
-          // end changes.
 
-          case 'Q':
+          case whiteQueen:
              gout.drawQueen(i, true);
              break;
-          case 'q':
+          case blackQueen:
              gout.drawQueen(i, false);
              break;
-          case 'R':
+          case whiteRook:
              gout.drawRook(i, true);
              break;
-          case 'r':
+          case blackRook:
              gout.drawRook(i, false);
              break;
-          case 'B':
+          case whiteBishop:
              gout.drawBishop(i, true);
              break;
-          case 'b':
+          case blackBishop:
              gout.drawBishop(i, false);
              break;
-          case 'N':
+          case whiteKnight:
              gout.drawKnight(i, true);
              break;
-          case 'n':
+          case blackKnight:
              gout.drawKnight(i, false);
              break;
           }
@@ -498,6 +497,20 @@ bool move(char* board, int positionFrom, int positionTo)
 
    return false;
 
+}
+
+void print(const std::string& message) {
+    cout << message << std::endl;
+}
+
+// Function to get input as a string
+std::string input(const string& prompt) {
+    std::string userInput;
+
+    cout << prompt;
+    getline(cin, userInput);
+
+    return userInput;
 }
 
 /*************************************
