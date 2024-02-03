@@ -244,7 +244,7 @@ set <tuple<int, char*>> getPossibleMoves(const char* board, int location)
     //
     // KING
     //
-    if (board[location] == 'K' || board[location] == 'k'){
+    if (board[location] == whiteKing || board[location] == blackKing){
 
         set <tuple<int, char*>> kingMoves;
 
@@ -281,7 +281,7 @@ set <tuple<int, char*>> getPossibleMoves(const char* board, int location)
     //
     // QUEEN
     //
-    if (board[location] == 'Q' || board[location] == 'q')
+    if (board[location] == whiteQueen || board[location] == blackQueen)
     {
         RC moves[8] =
         {
@@ -325,7 +325,7 @@ set <tuple<int, char*>> getPossibleMoves(const char* board, int location)
     //
     // ROOK
     //
-    if (board[location] == 'R' || board[location] == 'r')
+    if (board[location] == whiteRook || board[location] == blackRook)
     {
         RC moves[4] =
         {
@@ -360,7 +360,7 @@ set <tuple<int, char*>> getPossibleMoves(const char* board, int location)
     //
     // BISHOP
     //
-    if (board[location] == 'B' || board[location] == 'b')
+    if (board[location] == whiteBishop || board[location] == blackBishop)
     {
         RC moves[4] =
         {
@@ -437,18 +437,21 @@ void draw(const char* board, const Interface & ui, const set <int> & possible)
           case blackQueen:
              gout.drawQueen(i, false);
              break;
+
           case whiteRook:
              gout.drawRook(i, true);
              break;
           case blackRook:
              gout.drawRook(i, false);
              break;
+
           case whiteBishop:
              gout.drawBishop(i, true);
              break;
           case blackBishop:
              gout.drawBishop(i, false);
              break;
+
           case whiteKnight:
              gout.drawKnight(i, true);
              break;
@@ -462,8 +465,7 @@ void draw(const char* board, const Interface & ui, const set <int> & possible)
  * MOVE 
  * Execute one movement. Return TRUE if successful
  *********************************************/
-bool move(char* board, int positionFrom, int positionTo)
-{
+bool move(char* board, int positionFrom, int positionTo){
    // do not move if a move was not indicated
    if (positionFrom == -1 || positionTo == -1){
        return false;
