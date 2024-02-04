@@ -12,386 +12,15 @@
 #include <string>         // for STRING
 #include <tuple>
 #include<iostream>
+#include <cctype>
+#include <vector>
+#include <algorithm>
+#include"chellUtil.h"
+
 using namespace std;
 
-const char emptySpace = ' ';
+chessUtil chessutil = chessUtil();
 
-const char whitePawn = 'P';
-const char whiteKnight = 'N';
-const char whiteBishop = 'B';
-const char whiteRook = 'R';
-const char whiteQueen = 'Q';
-const char whiteKing = 'K';
-
-const char blackPawn = 'p';
-const char blackKnight = 'n';
-const char blackBishop = 'b';
-const char blackRook = 'r';
-const char blackQueen = 'q';
-const char blackKing = 'k';
-
-/***********************************************
- * Row Column
- * Simple row/column pair
- ************************************************/
-struct RC{
-   int row;
-   int col;
-};
-
-/****************************************************
- * IS NOT WHITE
- * Is the current location valid and the piece is either
- * black (uppercase) or space
- ***************************************************/
-inline bool isNotWhite(const char* board, int row, int col)
-{
-   // not white if we are off the board or if we are looking at a space
-   if (row < 0 || row >= 8 || col < 0 || col >= 8)
-      return false;
-   char piece = board[row * 8 + col];
-
-   return piece == ' ' || (piece >= 'A' && piece <= 'Z');
-}
-
-/****************************************************
- * IS  WHITE
- * Is the current location valid and the piece is white
- ***************************************************/
-inline bool isWhite(const char* board, int row, int col)
-{
-   // not white if we are off the board or if we are looking at a space
-   if (row < 0 || row >= 8 || col < 0 || col >= 8)
-      return false;
-   char piece = board[row * 8 + col];
-
-   return (piece >= 'a' && piece <= 'z');
-}
-
-/****************************************************
- * IS NOT BLACK
- * Is the current location valid and the piece is either
- * white (lowercase) or space
- ***************************************************/
-inline bool isNotBlack(const char* board, int row, int col)
-{
-   // not white if we are off the board or if we are looking at a space
-   if (row < 0 || row >= 8 || col < 0 || col >= 8)
-      return false;
-   char piece = board[row * 8 + col];
-
-   return piece == ' ' || (piece >= 'a' && piece <= 'z');
-}
-
-/****************************************************
- * IS  BLACK
- * Is the current location valid and the piece is black
- ***************************************************/
-inline bool isBlack(const char* board, int row, int col)
-{
-   // not white if we are off the board or if we are looking at a space
-   if (row < 0 || row >= 8 || col < 0 || col >= 8)
-      return false;
-   char piece = board[row * 8 + col];
-
-   return (piece >= 'A' && piece <= 'Z');
-}
-
-tuple<int, char*> standardMove(int location, int newLocation, const char* board){
-    char* tempBoard = new char[strlen(board) + 1];
-
-    tuple<int, char*>output;
-
-    strcpy(tempBoard, board);
-
-    tempBoard[location] = emptySpace;
-    tempBoard[newLocation] = board[location];
-
-    output = make_tuple(newLocation, tempBoard);
-
-    return output;
-}
-
-int convertToLocation(int row, int column) {
-    return row * 8 + column;
-}
-
-/*********************************************************
- * GET POSSIBLE MOVES
- * Determine all the possible moves for a given chess piece
- *********************************************************/
-set <tuple<int, char*>> getPossibleMoves(const char* board, int location)
-{
-    set <tuple<int, char*>> possible;
-
-    int newLocation;
-    tuple<int, char*> output;
-
-  
-
-  
-
-    // return the empty set if there simply are no possible moves
-    if (location < 0 || location >= 64 || board[location] == ' ') {
-        return possible;
-    }
-      
-
-    int row = location / 8;  // current location row
-    int col = location % 8;  // current location column
-    int r;                   // the row we are checking
-    int c;                   // the column we are checking
-    bool amBlack = isBlack(board, row, col);
-
-    //
-    // PAWN
-    //
-
-    if (board[location] == whitePawn)
-    {    
-        // move forward 2 blank spaces
-        c = col;
-        r = row - 2;
-        newLocation = convertToLocation(r, c);
-        if (row == 6 && board[newLocation] == ' ') {
-            possible.insert(standardMove(location, newLocation, board));  
-        }
-            
-        // move forward one blank spaces
-        r = row - 1;
-        newLocation = convertToLocation(r, c);
-        if (r >= 0 && board[newLocation] == ' '){
-            possible.insert(standardMove(location, newLocation, board));
-        }
-            
-        // attack left
-        c = col - 1;
-        newLocation = convertToLocation(r, c);
-        if (isWhite(board, r, c)){
-            possible.insert(standardMove(location, newLocation, board));
-        }
-
-        // attack right
-        c = col + 1;
-        newLocation = convertToLocation(r, c);
-        if (isWhite(board, r, c)) {
-            possible.insert(standardMove(location, newLocation, board));
-        }
-        
-        // what about en-passant and pawn promotion
-    }
-    if (board[location] == blackPawn)
-    {
-        // forward two blank spaces
-        c = col;
-        r = row + 2;
-        newLocation = convertToLocation(r, c);
-        if (row == 1 && board[r * 8 + c] == ' ')
-            possible.insert(standardMove(location, newLocation, board));
-        
-        // forward one blank space
-        r = row + 1;
-        newLocation = convertToLocation(r, c);
-        if (r < 8 && board[r * 8 + c] == ' ')
-            possible.insert(standardMove(location, newLocation, board));
-        
-        // attack left
-        c = col - 1;
-        newLocation = convertToLocation(r, c);
-        if (isBlack(board, r, c))
-            possible.insert(standardMove(location, newLocation, board));
-        
-        // attack right
-        c = col + 1;
-        newLocation = convertToLocation(r, c);
-        if (isBlack(board, r, c))
-            possible.insert(standardMove(location, newLocation, board));
-        
-        // what about en-passant and pawn promotion?
-        // 
-        // We need to access move history to do en-passant
-
-        // we need a GUI to do pawn promotion
-    }
-
-    //
-    // KNIGHT
-    //
-    if (board[location] == whiteKnight || board[location] == blackKnight){
-        RC moves[8] = 
-        {
-                {-1,  2}, { 1,  2},
-        {-2,  1},                    { 2,  1},
-        {-2, -1},                    { 2, -1},
-                {-1, -2}, { 1, -2}
-        };
-
-
-        for each (RC space in moves) {
-
-            r = row + space.row;
-            c = col + space.col;
-            newLocation = convertToLocation(r, c);
-
-            if ( amBlack && isNotBlack(board, r, c))
-                possible.insert(standardMove(location, newLocation, board));
-
-            if ( !amBlack && isNotWhite(board, r, c))
-                possible.insert(standardMove(location, newLocation, board));
-        }
-    }
-
-    //
-    // KING
-    //
-    if (board[location] == whiteKing || board[location] == blackKing){
-
-        set <tuple<int, char*>> kingMoves;
-
-        RC moves[8] =
-        {
-            {-1,  1}, {0,  1}, {1,  1},
-            {-1,  0},          {1,  0},
-            {-1, -1}, {0, -1}, {1, -1}
-        };
-
-
-        for each (RC space in moves){
-            r = row + space.row;
-            c = col + space.col;
-            newLocation = convertToLocation(r, c);
-            if ( amBlack && isNotBlack(board, r, c)){
-                kingMoves.insert(standardMove(location, newLocation, board));
-            }
-            
-            if (!amBlack && isNotWhite(board, r, c)){
-                kingMoves.insert(standardMove(location, newLocation, board));
-            }
-        }
-        // what about castling?
-
-        // what about check?
-
-        // We are going to have to check to see if any of the kings moves put them in check eventualy, 
-        // so ive put the kings moves in a seprate set and we combine them at the end of the if.
-        possible.insert(kingMoves.begin(), kingMoves.end());
-
-    }
-
-    //
-    // QUEEN
-    //
-    if (board[location] == whiteQueen || board[location] == blackQueen)
-    {
-        RC moves[8] =
-        {
-            {-1,  1}, {0,  1}, {1,  1},
-            {-1,  0},          {1,  0},
-            {-1, -1}, {0, -1}, {1, -1}
-        };
-        for each (RC space in moves)
-        {
-            r = row + space.row;
-            c = col + space.col;
-            newLocation = convertToLocation(r, c);
-
-            // loop though every space in the current direction
-            while (r >= 0 && r < 8 && c >= 0 && c < 8 && 
-                // you hit a peice
-                board[newLocation] == ' '){
-
-                
-
-                possible.insert(standardMove(location, newLocation, board));
-                
-                // ideratate the dierection 
-                r += space.row;
-                c += space.col;
-                newLocation = convertToLocation(r, c);
-            }
-
-            // if the above loop stoped due to hitting a enemy peice
-            // add its location to the list.
-            if (amBlack && isNotBlack(board, r, c)) {
-                possible.insert(standardMove(location, newLocation, board));
-            }
-            if (!amBlack && isNotWhite(board, r, c)) {
-                possible.insert(standardMove(location, newLocation, board));
-            }
-            
-        }
-    }
-
-    //
-    // ROOK
-    //
-    if (board[location] == whiteRook || board[location] == blackRook)
-    {
-        RC moves[4] =
-        {
-                    {0,  1},
-            {-1, 0},         {1, 0},
-                    {0, -1}
-        };
-        for (int i = 0; i < 4; i++)
-        {
-            r = row + moves[i].row;
-            c = col + moves[i].col;
-            newLocation = convertToLocation(r, c);
-            while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
-            board[newLocation] == ' ')
-            {
-                possible.insert(standardMove(location, newLocation, board));
-
-                r += moves[i].row;
-                c += moves[i].col;
-                newLocation = convertToLocation(r, c);
-            }
-            if (amBlack && isNotBlack(board, r, c)){
-                possible.insert(standardMove(location, newLocation, board));
-            }
-
-            if (!amBlack && isNotWhite(board, r, c)){
-                possible.insert(standardMove(location, newLocation, board));
-            }
-        }
-    }
-
-    //
-    // BISHOP
-    //
-    if (board[location] == whiteBishop || board[location] == blackBishop)
-    {
-        RC moves[4] =
-        {
-            {-1,  1}, {1,  1},
-            {-1, -1}, {1, -1}
-        };
-        for (int i = 0; i < 4; i++){
-
-            r = row + moves[i].row;
-            c = col + moves[i].col;
-            newLocation = convertToLocation(r, c);
-            while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
-                board[newLocation] == ' '){
-
-                possible.insert(standardMove(location, newLocation, board));
-                r += moves[i].row;
-                c += moves[i].col;
-                newLocation = convertToLocation(r, c);
-            }
-
-            if (amBlack && isNotBlack(board, r, c)){
-                possible.insert(standardMove(location, newLocation, board));
-            }
-            if (!amBlack && isNotWhite(board, r, c)){
-                possible.insert(standardMove(location, newLocation, board));
-            }
-        }
-    }
-
-   return possible;
-}
 
 /***************************************************
  * DRAW
@@ -417,103 +46,55 @@ void draw(const char* board, const Interface & ui, const set <int> & possible)
    for (int i = 0; i < 64; i++)
           switch (board[i])
           {
-          case whitePawn:
+          case chessutil.whitePawn:
              gout.drawPawn(i, true);
              break;
-          case blackPawn:
+          case chessutil.blackPawn:
              gout.drawPawn(i, false);
              break;
           
-          case whiteKing:
+          case chessutil.whiteKing:
              gout.drawKing(i, true);
              break;
-          case blackKing:
+          case chessutil.blackKing:
              gout.drawKing(i, false);
              break;
 
-          case whiteQueen:
+          case chessutil.whiteQueen:
              gout.drawQueen(i, true);
              break;
-          case blackQueen:
+          case chessutil.blackQueen:
              gout.drawQueen(i, false);
              break;
 
-          case whiteRook:
+          case chessutil.whiteRook:
              gout.drawRook(i, true);
              break;
-          case blackRook:
+          case chessutil.blackRook:
              gout.drawRook(i, false);
              break;
 
-          case whiteBishop:
+          case chessutil.whiteBishop:
              gout.drawBishop(i, true);
              break;
-          case blackBishop:
+          case chessutil.blackBishop:
              gout.drawBishop(i, false);
              break;
 
-          case whiteKnight:
+          case chessutil.whiteKnight:
              gout.drawKnight(i, true);
              break;
-          case blackKnight:
+          case chessutil.blackKnight:
              gout.drawKnight(i, false);
              break;
           }
 }
 
-/*********************************************
- * MOVE 
- * Execute one movement. Return TRUE if successful
- *********************************************/
-bool move(char* board, int positionFrom, int positionTo){
-   // do not move if a move was not indicated
-   if (positionFrom == -1 || positionTo == -1){
-       return false;
-   }
-   assert(positionFrom >= 0 && positionFrom < 64);
-   assert(positionTo >= 0 && positionTo < 64);
 
 
-   
 
-   // find the set of possible moves from our current location
-   set <tuple<int, char*>> possiblePrevious = getPossibleMoves(board, positionFrom);
 
-   bool moveIsValid = false;
 
-   char* newBoard;
-
-   for each (tuple<int, char*> move in possiblePrevious){
-        if (get<0>(move) == positionTo) {
-            moveIsValid = true;
-            newBoard = strdup(std::get<1>(move));
-        }
-   }
-
-   // only move there is the suggested move is on the set of possible moves
-   if (moveIsValid == true){
-        strcpy(board, newBoard);
-        free(newBoard);
-        return true;
-   }
-
-   return false;
-
-}
-
-void print(const std::string& message) {
-    cout << message << std::endl;
-}
-
-// Function to get input as a string
-std::string input(const string& prompt) {
-    std::string userInput;
-
-    cout << prompt;
-    getline(cin, userInput);
-
-    return userInput;
-}
 
 /*************************************
  * All the interesting work happens here, when
@@ -530,13 +111,15 @@ void callBack(Interface *pUI, void * p)
    // is the first step of every single callback function in OpenGL. 
    char * board = (char *)p;
 
+
+
    // move 
-   if (move(board, pUI->getPreviousPosition(), pUI->getSelectPosition())){
+   if (chessutil.move(board, pUI->getPreviousPosition(), pUI->getSelectPosition())){
        pUI->clearSelectPosition();
    }
 
    else{
-       possible = getPossibleMoves(board, pUI->getSelectPosition());
+       possible = chessutil.getPossibleMoves(board, pUI->getSelectPosition());
    }
 
    // if we clicked on a blank spot, then it is not selected
@@ -643,7 +226,7 @@ void readFile(const char* fileName, char* board)
       int positionFrom;
       int positionTo;
       parse(textMove, positionFrom, positionTo);
-      valid = move(board, positionFrom, positionTo);
+      valid = chessutil.move(board, positionFrom, positionTo);
    }
 
    // close and done
@@ -671,15 +254,15 @@ int main(int argc, char** argv)
    // Initialize the game class
    // note this is upside down: 0 row is at the bottom
    char board[64] = {
-      blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook,
-      blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn,
+      chessutil.blackRook, chessutil.blackKnight, chessutil.blackBishop, chessutil.blackQueen, chessutil.blackKing, chessutil.blackBishop, chessutil.blackKnight, chessutil.blackRook,
+      chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn,
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
       // ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', // what is this doing here????
-      whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn,
-      whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook
+      chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn,
+      chessutil.whiteRook, chessutil.whiteKnight, chessutil.whiteBishop, chessutil.whiteQueen, chessutil.whiteKing, chessutil.whiteBishop, chessutil.whiteKnight, chessutil.whiteRook
    };
    
 #ifdef _WIN32

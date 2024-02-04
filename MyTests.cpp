@@ -1,10 +1,14 @@
 #include "MyTests.h"
-#include<set>
+#include <set>
 #include <iostream>
-#include"chess.cpp"
+#include <cassert>
+#include "chellUtil.h"
+#include <tuple>
 
 
 using namespace std;
+
+chessUtil chessutil2 = chessUtil();
 
 
 void MyTests::testCastling()
@@ -12,35 +16,45 @@ void MyTests::testCastling()
     const char* board = ("rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR");
     int kingPosition = 4;
 
-    set<int> possibleMoves = getPossibleMoves(board, kingPosition);
+    set<tuple<int, char*>> possibleMoves = chessutil2.getPossibleMoves(board, kingPosition);
 
-    assert(possibleMoves.find(2) != possibleMoves.end()); // King's side castling
-    assert(possibleMoves.find(6) != possibleMoves.end()); // Queen's side castling
+    set<int> oldPossibleMoves = set<int>();
+
+    for each (tuple<int, char*> move in possibleMoves) {
+        oldPossibleMoves.insert(get<0>(move));
+    }
+
+    assert(oldPossibleMoves.find(2) != oldPossibleMoves.end()); // King's side castling
+    assert(oldPossibleMoves.find(6) != oldPossibleMoves.end()); // Queen's side castling
 }
+
 
 void MyTests::testPawnPromotion()
 {
-    const char* board = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
-    int pawnPosition = 8;
+    char board[64] = {
+       chessutil2.blackRook, chessutil2.blackKnight, chessutil2.blackBishop, chessutil2.blackQueen, chessutil2.blackKing, chessutil2.blackBishop, chessutil2.blackKnight, chessutil2.blackRook,
+       chessutil2.blackPawn, chessutil2.blackPawn, ' ', chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn,
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', chessutil2.blackPawn, ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
+    };
 
-    std::set<int> possibleMoves = getPossibleMoves(board, pawnPosition);
+    int pawnPosition = 52;
+    int pawnMoveTo = 60;
 
-    if (!possibleMoves.empty())
-    {
-        assert(possibleMoves.find(0) != possibleMoves.end()); // Promote to rook
-        assert(possibleMoves.find(1) != possibleMoves.end()); // Promote to knight
-        assert(possibleMoves.find(2) != possibleMoves.end()); // Promote to bishop
-        assert(possibleMoves.find(3) != possibleMoves.end()); // Promote to queen
-    }
-    else
-    {
-        // Check if there is a pawn in the last row of a different color
-        char lastRowPawn = board[56]; // Assuming last row index is 56
-        if (lastRowPawn != ' ' && ((pawnPosition < 16 && lastRowPawn >= 'a') || (pawnPosition >= 48 && lastRowPawn <= 'Z')))
-        {
-            cout << "Error: Pawn in the last row not promoted!" << std::endl;
-            return;
-        }
+    bool pass = chessutil2.move(board, pawnPosition, pawnMoveTo);
+
+    if (pass == true){
+        assert(board[pawnMoveTo] != ' ');
+
+        bool isPeiceBlack = chessutil2.isBlack(board, pawnMoveTo / 8, pawnMoveTo % 8);
+
+        assert(isPeiceBlack == true);
+        assert(board[pawnMoveTo] != chessutil2.blackPawn);
+        assert(board[pawnMoveTo] != chessutil2.blackKing);
     }
 }
 
@@ -50,7 +64,13 @@ void MyTests::testEnPasent()
     int pawnPosition = 28;
     int capturePoint = 21;
 
-    set<int> possibleMoves = getPossibleMoves(board, pawnPosition);
+    set<tuple<int, char*>> possibleMoves = chessutil2.getPossibleMoves(board, pawnPosition);
 
-    assert(possibleMoves.find(capturePoint) != possibleMoves.end());
+    auto isCapturePoint = [capturePoint](const tuple<int, char*>& move) {
+        return get<0>(move) == capturePoint;
+    };
+
+    auto it = std::find_if(possibleMoves.begin(), possibleMoves.end(), isCapturePoint);
+
+    assert(it != possibleMoves.end());
 }
