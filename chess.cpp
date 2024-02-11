@@ -11,88 +11,184 @@
 #include <fstream>        // for IFSTREAM
 #include <string>         // for STRING
 #include <tuple>
-#include<iostream>
+#include <iostream>
 #include <cctype>
 #include <vector>
 #include <algorithm>
-#include"chellUtil.h"
+#include "MyTests.h"
+
+// the chess peices
+#include "Pawn.h"
+#include "Bishop.h"
+#include "Rook.h"
+#include "Knight.h"
+#include "Queen.h"
+#include "King.h"
+#include "EmptySpace.h"
 
 using namespace std;
 
-chessUtil chessutil = chessUtil();
+ogstream gout;
+Board myBoard = Board(&gout);
 
 
-/***************************************************
- * DRAW
- * Draw the current state of the game
- ***************************************************/
-void draw(const char* board, const Interface & ui, const set <int> & possible)
-{
-   ogstream gout;
-   
-   // draw the checkerboard
-   gout.drawBoard();
+bool checkPromotion(const Board board, Position position) {
+    // Assuming position is a valid index (0 to 63) in the board array
+    int row = position / 8;
 
-   // draw any selections
-   gout.drawHover(ui.getHoverPosition());
-   gout.drawSelected(ui.getSelectPosition());
+    // Check if the pawn is in a promotion position
+    if ((board[position] == 'P' && row == 0) || (board[position] == 'p' && row == 7)) {
+        // Pawn is in a position for promotion
+        return true;
+    }
 
-   // draw the possible moves
-   set <int> :: iterator it;
-   for (it = possible.begin(); it != possible.end(); ++it)
-      gout.drawPossible(*it);
+    // No promotion position
+    return false;
+}
 
-   // draw the pieces
-   for (int i = 0; i < 64; i++)
-          switch (board[i])
-          {
-          case chessutil.whitePawn:
-             gout.drawPawn(i, true);
-             break;
-          case chessutil.blackPawn:
-             gout.drawPawn(i, false);
-             break;
-          
-          case chessutil.whiteKing:
-             gout.drawKing(i, true);
-             break;
-          case chessutil.blackKing:
-             gout.drawKing(i, false);
-             break;
+string toLowerCase(const string& input) {
+    string result;
 
-          case chessutil.whiteQueen:
-             gout.drawQueen(i, true);
-             break;
-          case chessutil.blackQueen:
-             gout.drawQueen(i, false);
-             break;
+    for (char c : input) {
+        result += tolower(c);
+    }
 
-          case chessutil.whiteRook:
-             gout.drawRook(i, true);
-             break;
-          case chessutil.blackRook:
-             gout.drawRook(i, false);
-             break;
+    return result;
+}
 
-          case chessutil.whiteBishop:
-             gout.drawBishop(i, true);
-             break;
-          case chessutil.blackBishop:
-             gout.drawBishop(i, false);
-             break;
+string toUpperCase(const string& input) {
+    string result;
 
-          case chessutil.whiteKnight:
-             gout.drawKnight(i, true);
-             break;
-          case chessutil.blackKnight:
-             gout.drawKnight(i, false);
-             break;
-          }
+    for (char c : input) {
+        result += toupper(c);
+    }
+
+    return result;
+}
+
+template <typename T>
+bool vectorContainsValue(const std::vector<T>& vec, const T& value) {
+    auto it = std::find(vec.begin(), vec.end(), value);
+    return it != vec.end();
+}
+
+std::string vectorToString(const std::vector<std::string>& vec) {
+    if (vec.empty()) {
+        return "";
+    }
+
+    std::string result = vec[0];
+
+    for (size_t i = 1; i < vec.size(); ++i) {
+        result += ", " + vec[i];
+    }
+
+    return result;
+}
+
+bool isCapitalLetter(char c) {
+    return std::isupper(static_cast<unsigned char>(c)) != 0;
 }
 
 
+void print(const std::string& message) {
+    cout << message << std::endl;
+}
+
+// Function to get input as a string
+string input(const string& prompt) {
+    string userInput;
+
+    cout << prompt;
+    getline(cin, userInput);
+
+    return userInput;
+}
 
 
+/*********************************************
+ * MOVE
+ * Execute one movement. Return TRUE if successful
+ *********************************************/
+bool move(Board& board, Position& positionFrom, Position& positionTo) {
+    // do not move if a move was not indicated
+    if (positionFrom.getLocation() == -1 || positionTo.getLocation() == -1) {
+        return false;
+    }
+    assert(positionFrom.getLocation() >= 0 && positionFrom.getLocation() < 64);
+    assert(positionTo.getLocation() >= 0 && positionTo.getLocation() < 64);
+
+
+
+
+    // find the set of possible moves from our current location
+    vector <tuple<Position, Board>> possiblePrevious = board[positionFrom].getPossibleMoves(positionFrom, board);
+
+    bool moveIsValid = false;
+
+    Board newBoard;
+
+    for each (tuple<Position, Board> move in possiblePrevious) {
+        if (get<0>(move) == positionTo) {
+            moveIsValid = true;
+            newBoard = get<1>(move);
+        }
+    }
+
+    // only move there is the suggested move is on the set of possible moves
+    if (moveIsValid == true) {
+
+        // there is alot of code we are not using here for handling using input.
+        // I plan to re enable this once we i figure out how to get any input from the user. >:(
+
+        board = newBoard;
+
+        // cin doesent work to get input from the user, so has been disabled.
+        if (checkPromotion(board, positionTo) == true && false) {
+            bool validInput = false;
+
+            vector<string> validInputs = vector<string>{
+                "q", "n", "b", "r"
+            };
+
+            string validInputsString = vectorToString(validInputs);
+
+            string userInput = "";
+
+            while (validInput == false) {
+                //userInput = toLowerCase(input("What would you like to promote your pawn to?"));
+
+                userInput = "q";
+
+                if (vectorContainsValue(validInputs, userInput) == false) {
+                    print("InvalidInput. Please input one of the following:");
+                    print(validInputsString);
+                }
+                else {
+                    validInput == true;
+                }
+            }
+
+            if (isCapitalLetter(board[positionTo]) == true) {
+                userInput = toUpperCase(userInput);
+            }
+
+            assert(userInput.size() == 1);
+
+            const char* cStrUserInput = userInput.c_str();
+
+            bool isBlack = board[positionTo].getIsBlack();
+
+            board[positionTo] = Queen(isBlack, board.getGout());
+
+        }
+
+        return true;
+    }
+
+    return false;
+
+}
 
 
 
@@ -105,37 +201,38 @@ void draw(const char* board, const Interface & ui, const set <int> & possible)
  **************************************/
 void callBack(Interface *pUI, void * p)
 {
-    set <tuple<int, char*>> possible;
+    vector <tuple<Position, Board>> possible;
 
    // the first step is to cast the void pointer into a game object. This
    // is the first step of every single callback function in OpenGL. 
-   char * board = (char *)p;
 
 
 
    // move 
-   if (chessutil.move(board, pUI->getPreviousPosition(), pUI->getSelectPosition())){
-       pUI->clearSelectPosition();
-   }
+    bool success = move(myBoard, Position(pUI->getPreviousPosition()), Position(pUI->getSelectPosition()));
+    if (success){
+        pUI->clearSelectPosition();
+    }
 
-   else{
-       possible = chessutil.getPossibleMoves(board, pUI->getSelectPosition());
-   }
+    else{
 
-   // if we clicked on a blank spot, then it is not selected
-   if (pUI->getSelectPosition() != -1 && board[pUI->getSelectPosition()] == ' '){
-       pUI->clearSelectPosition();
-   }
+        possible = myBoard[Position(pUI->getSelectPosition())].getPossibleMoves(Position(pUI->getSelectPosition()), myBoard);
+    }
 
-   set<int> possibleLocations = set<int>();
+    // if we clicked on a blank spot, then it is not selected
+    if (pUI->getSelectPosition() != -1 && myBoard[Position(pUI->getSelectPosition())] == EmptySpace()) {
+        pUI->clearSelectPosition();
+    }
 
-   for each (tuple<int, char*> move in possible)
+    vector<Position> possibleLocations = vector<Position>();
+
+   for each (tuple<Position, Board> move in possible)
    {
-       possibleLocations.insert(get<0>(move));
+       possibleLocations.emplace_back(get<0>(move));
    }
 
    // draw the board
-   draw(board, *pUI, possibleLocations);
+   myBoard.drawBoard(*pUI, possibleLocations);
 
 }
 
@@ -144,7 +241,7 @@ void callBack(Interface *pUI, void * p)
  * Determine the nature of the move based on the input.
  * This is the only function understanding Smith notation
  *******************************************************/
-void parse(const string& textMove, int& positionFrom, int& positionTo)
+void parse(const string& textMove, Position& positionFrom, Position& positionTo)
 {
    string::const_iterator it = textMove.cbegin();
 
@@ -153,14 +250,14 @@ void parse(const string& textMove, int& positionFrom, int& positionTo)
    it++;
    int row = *it - '1';
    it++;
-   positionFrom = row * 8 + col;
+   positionFrom.setXY(row, col);
 
    // get the destination
    col = *it - 'a';
    it++;
    row = *it - '1';
    it++;
-   positionTo = row * 8 + col;
+   positionTo.setXY(row, col);
 
    // capture and promotion information
    char capture = ' ';
@@ -211,7 +308,7 @@ void parse(const string& textMove, int& positionFrom, int& positionTo)
  * READ FILE
  * Read a file where moves are encoded in Smith notation
  *******************************************************/
-void readFile(const char* fileName, char* board)
+void readFile(const char* fileName, Board& board)
 {
    // open the file
    ifstream fin(fileName);
@@ -223,21 +320,27 @@ void readFile(const char* fileName, char* board)
    bool valid = true;
    while (valid && fin >> textMove)
    {
-      int positionFrom;
-      int positionTo;
+      Position positionFrom;
+      Position positionTo;
       parse(textMove, positionFrom, positionTo);
-      valid = chessutil.move(board, positionFrom, positionTo);
+
+      valid = move(board, positionFrom, positionTo);
    }
 
    // close and done
    fin.close();
 }
 
+
 /*********************************
  * Main is pretty sparse.  Just initialize
  * my Demo type and call the display engine.
  * That is all!
  *********************************/
+// pretty sparse my leg! this make __no__ since. 
+// Heck, you have somehow disabled the terminal and now i cant print debug lines! >:(
+
+
 #ifdef _WIN32
 #include <windows.h>
 int WINAPI WinMain(
@@ -249,35 +352,50 @@ int WINAPI WinMain(
 int main(int argc, char** argv)
 #endif // !_WIN32
 {
-   Interface ui("Chess");    
+   Interface ui("Chess");
+
+   
 
    // Initialize the game class
    // note this is upside down: 0 row is at the bottom
-   char board[64] = {
-      chessutil.blackRook, chessutil.blackKnight, chessutil.blackBishop, chessutil.blackQueen, chessutil.blackKing, chessutil.blackBishop, chessutil.blackKnight, chessutil.blackRook,
-      chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn, chessutil.blackPawn,
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-      // ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', // what is this doing here????
-      chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn, chessutil.whitePawn,
-      chessutil.whiteRook, chessutil.whiteKnight, chessutil.whiteBishop, chessutil.whiteQueen, chessutil.whiteKing, chessutil.whiteBishop, chessutil.whiteKnight, chessutil.whiteRook
+
+   
+
+   myBoard.board = std::vector<Piece*>{
+       new Rook(true, myBoard.getGout()), new Knight(true, myBoard.getGout()), new Bishop(true, myBoard.getGout()), new Queen(true, myBoard.getGout()), new King(true, myBoard.getGout()), new Bishop(true, myBoard.getGout()), new Knight(true, myBoard.getGout()), new Rook(true, myBoard.getGout()),
+       new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()),
+       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+       new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()),
+       new Rook(false, myBoard.getGout()), new Knight(false, myBoard.getGout()), new Bishop(false, myBoard.getGout()), new Queen(false, myBoard.getGout()), new King(false, myBoard.getGout()), new Bishop(false, myBoard.getGout()), new Knight(false, myBoard.getGout()), new Rook(false, myBoard.getGout())
    };
+
+
+   char rawboard[64];
+
+   for (int i = 0; i < 64; i++)
+   {
+       rawboard[i] = myBoard[i];
+   }
    
 #ifdef _WIN32
  //  int    argc;
  //  LPWSTR * argv = CommandLineToArgvW(GetCommandLineW(), &argc);
  //  string filename = argv[1];
    if (__argc == 2)
-      readFile(__argv[1], board);
+      readFile(__argv[1], myBoard);
 #else // !_WIN32
    if (argc == 2)
       readFile(argv[1], board);
 #endif // !_WIN32
+   MyTests runner = MyTests();
 
    // set everything into action
-   ui.run(callBack, board);             
+   ui.run(callBack, rawboard);             
 
    return 0;
 }
+
+

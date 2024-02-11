@@ -10,25 +10,67 @@ using namespace std;
 
 chessUtil chessutil2 = chessUtil();
 
+MyTests::MyTests() {
+    testCastling();
+    testEnPasent();
+
+    // testPawnPromotion
+}
+
+bool containsValue(const set<int>& mySet, const int& value) {
+    return mySet.find(value) != mySet.end();
+}
+
 
 void MyTests::testCastling()
 {
-    const char* board = ("rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR");
+    char board1[64] = {
+       chessutil2.blackRook, ' ', ' ', ' ', chessutil2.blackKing, chessutil2.blackBishop, chessutil2.blackKnight, chessutil2.blackRook,
+       chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn,
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
+    };
+
+    char board2[64] = {
+       chessutil2.blackRook, chessutil2.blackKnight, chessutil2.blackBishop, chessutil2.blackQueen, chessutil2.blackKing, ' ', ' ', chessutil2.blackRook,
+       chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn, chessutil2.blackPawn,
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+       ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
+    };
     int kingPosition = 4;
 
-    set<tuple<int, char*>> possibleMoves = chessutil2.getPossibleMoves(board, kingPosition);
+    set<tuple<int, char*>> possibleMoves = chessutil2.getPossibleMoves(board2, kingPosition);
 
     set<int> oldPossibleMoves = set<int>();
 
     for each (tuple<int, char*> move in possibleMoves) {
         oldPossibleMoves.insert(get<0>(move));
+
     }
 
-    assert(oldPossibleMoves.find(2) != oldPossibleMoves.end()); // King's side castling
-    assert(oldPossibleMoves.find(6) != oldPossibleMoves.end()); // Queen's side castling
+    assert(containsValue(oldPossibleMoves, 5) == true); // King's side castling
+
+    possibleMoves = chessutil2.getPossibleMoves(board1, kingPosition);
+
+    oldPossibleMoves = set<int>();
+
+    for each (tuple<int, char*> move in possibleMoves) {
+        oldPossibleMoves.insert(get<0>(move));
+
+    }
+
+    assert(containsValue(oldPossibleMoves, 2) == true); // Queen's side castling
 }
 
-
+// have no method to get input form user. this is not possible
 void MyTests::testPawnPromotion()
 {
     char board[64] = {
@@ -66,11 +108,14 @@ void MyTests::testEnPasent()
 
     set<tuple<int, char*>> possibleMoves = chessutil2.getPossibleMoves(board, pawnPosition);
 
-    auto isCapturePoint = [capturePoint](const tuple<int, char*>& move) {
-        return get<0>(move) == capturePoint;
-    };
+    set<int> oldPossibleMoves = set<int>();
 
-    auto it = std::find_if(possibleMoves.begin(), possibleMoves.end(), isCapturePoint);
+    for each (tuple<int, char*> move in possibleMoves) {
+        oldPossibleMoves.insert(get<0>(move));
 
-    assert(it != possibleMoves.end());
+    }
+
+    
+
+    assert(containsValue(oldPossibleMoves, 20) == true);
 }

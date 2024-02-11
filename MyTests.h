@@ -4,6 +4,6 @@ public:
 	void testCastling();
 	void testPawnPromotion();
 	void testEnPasent();
-
+	MyTests();
 };
 
