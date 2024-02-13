@@ -1,3 +1,4 @@
+#pragma once
 #include "Piece.h"
 #include "Position.h"
 #include "Board.h"
@@ -37,7 +38,7 @@ char Piece::getSymbol() const {
 	return symbol;
 }
 
-tuple<Position, Board> Piece::standardMove(const Position& location, const Position& newLocation, Board& boardInput) const{
+tuple<Position, Board> Piece::standardMove(const Position& location, const Position& newLocation, const Board& boardInput) const{
 
 
     Board tempBoard(boardInput);

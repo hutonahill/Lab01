@@ -149,4 +149,6 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
     
 }
 
-
+void Pawn::drawPiece(int rawLocation) const {
+    Piece::gout->drawPawn(rawLocation, getIsBlack());
+}

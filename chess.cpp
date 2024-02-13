@@ -15,7 +15,6 @@
 #include <cctype>
 #include <vector>
 #include <algorithm>
-#include "MyTests.h"
 
 // the chess peices
 #include "Pawn.h"
@@ -29,7 +28,19 @@
 using namespace std;
 
 ogstream gout;
-Board myBoard = Board(&gout);
+
+vector<Piece*> startingBoard = vector<Piece*>{
+    new Rook(true, &gout), new Knight(true, &gout), new Bishop(true, &gout), new Queen(true, &gout), new King(true, &gout), new Bishop(true, &gout), new Knight(true, &gout), new Rook(true, &gout),
+    new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout), new Pawn(true, &gout),
+    new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+    new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+    new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+    new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
+    new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout), new Pawn(false, &gout),
+    new Rook(false, &gout), new Knight(false, &gout), new Bishop(false, &gout), new Queen(false, &gout), new King(false, &gout), new Bishop(false, &gout), new Knight(false, &gout), new Rook(false, &gout)
+};
+
+Board myBoard = Board(gout, startingBoard);
 
 
 bool checkPromotion(const Board board, Position position) {
@@ -359,19 +370,6 @@ int main(int argc, char** argv)
    // Initialize the game class
    // note this is upside down: 0 row is at the bottom
 
-   
-
-   myBoard.board = std::vector<Piece*>{
-       new Rook(true, myBoard.getGout()), new Knight(true, myBoard.getGout()), new Bishop(true, myBoard.getGout()), new Queen(true, myBoard.getGout()), new King(true, myBoard.getGout()), new Bishop(true, myBoard.getGout()), new Knight(true, myBoard.getGout()), new Rook(true, myBoard.getGout()),
-       new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()), new Pawn(true, myBoard.getGout()),
-       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
-       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
-       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
-       new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(), new EmptySpace(),
-       new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()), new Pawn(false, myBoard.getGout()),
-       new Rook(false, myBoard.getGout()), new Knight(false, myBoard.getGout()), new Bishop(false, myBoard.getGout()), new Queen(false, myBoard.getGout()), new King(false, myBoard.getGout()), new Bishop(false, myBoard.getGout()), new Knight(false, myBoard.getGout()), new Rook(false, myBoard.getGout())
-   };
-
 
    char rawboard[64];
 
@@ -390,7 +388,6 @@ int main(int argc, char** argv)
    if (argc == 2)
       readFile(argv[1], board);
 #endif // !_WIN32
-   MyTests runner = MyTests();
 
    // set everything into action
    ui.run(callBack, rawboard);             

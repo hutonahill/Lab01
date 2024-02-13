@@ -10,13 +10,14 @@ Board::Board(Board* oldBoard){
     gout = oldBoard->gout;
 }
 
-Board::Board(ogstream* goutInput) {
-    gout = goutInput;
+Board::Board(ogstream& goutInput, const vector<Piece*>& startingBoard) {
+    gout = &goutInput;
+    board = startingBoard;
 }
 
 Board::Board() {
     board;
-    gout = NULL;
+    gout = nullptr;
 }
 
 bool Board::isWhite(Position location) const {

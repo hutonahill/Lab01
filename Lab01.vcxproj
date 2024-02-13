@@ -104,7 +104,6 @@
     <ClCompile Include="EmptySpace.cpp" />
     <ClCompile Include="King.cpp" />
     <ClCompile Include="Knight.cpp" />
-    <ClCompile Include="MyTests.cpp" />
     <ClCompile Include="Pawn.cpp" />
     <ClCompile Include="Piece.cpp" />
     <ClCompile Include="Position.cpp" />
@@ -119,7 +118,6 @@
     <ClInclude Include="EmptySpace.h" />
     <ClInclude Include="King.h" />
     <ClInclude Include="Knight.h" />
-    <ClInclude Include="MyTests.h" />
     <ClInclude Include="Pawn.h" />
     <ClInclude Include="Piece.h" />
     <ClInclude Include="Position.h" />

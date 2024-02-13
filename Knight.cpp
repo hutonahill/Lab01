@@ -7,7 +7,7 @@ char Knight::blackSymbol = blackKnight;
 char Knight::whiteSymbol = whiteKnight;
 
 vector<tuple<Position, Board>> Knight::getPossibleMoves(const Position& currentPosition, const Board& board) const {
-    
+
     Position newLocation;
     vector<tuple<Position, Board>> possible;
 
@@ -31,8 +31,8 @@ vector<tuple<Position, Board>> Knight::getPossibleMoves(const Position& currentP
 
         if (!Piece::getIsBlack() && board.isNotWhite(newLocation))
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
-        }
-    
+    }
+    return possible;
 }
 
 void Knight::drawPiece(int rawLocation) const {

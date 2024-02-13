@@ -1,12 +1,15 @@
 #pragma once
 #include "Position.h"
 #include "Board.h"
+#include "uiDraw.h"
 
 #include <vector>
 #include <tuple>
 #include <functional>
 
 using namespace std;
+
+class Board;
 
 struct RC {
 	int row;
@@ -62,7 +65,7 @@ public:
 	
 
 protected:
-	tuple<Position, Board> standardMove(const Position& location, const Position& newLocation, Board& board) const;
+	tuple<Position, Board> standardMove(const Position& location, const Position& newLocation, const Board& board) const;
 	ogstream* gout;
 
 private:

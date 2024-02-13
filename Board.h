@@ -9,11 +9,13 @@
 
 using namespace std;
 
+class Piece;
+
 class Board{
 public:
 	Board(Board* oldBoard);
 
-	Board(ogstream* goutInput);
+	Board(ogstream& goutInput, const vector<Piece*>& startingBoard);
 
 	Board();
 

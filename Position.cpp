@@ -18,6 +18,10 @@ Position::Position(const Position& rhs) : location(0)
     location = rhs.location;
 }
 
+double Position::squareWidth = 8;
+double Position::squareHeight = 8;
+
+
 /***********************************************
  * POSITION : INEQUALITY
  **********************************************/
