@@ -15,12 +15,12 @@ Board::Board(ogstream* goutInput) {
 }
 
 Board::Board() {
-    board = vector<Piece>(64);
+    board;
     gout = NULL;
 }
 
 bool Board::isWhite(Position location) const {
-    if (board[location.getLocation()].getIsEmpty()) {
+    if ((*board[location.getLocation()]).getIsEmpty()) {
         return false;
     }
     
@@ -28,7 +28,7 @@ bool Board::isWhite(Position location) const {
 }
 
 bool Board::isNotWhite(Position location) const {
-    if (board[location.getLocation()].getIsEmpty()) {
+    if ((*board[location.getLocation()]).getIsEmpty()) {
         return true;
     }
     
@@ -36,14 +36,14 @@ bool Board::isNotWhite(Position location) const {
 }
 
 bool Board::isBlack(Position location) const {
-    if (board[location.getLocation()].getIsEmpty()) {
+    if ((*board[location.getLocation()]).getIsEmpty()) {
         return false;
     }
-    return board[location.getLocation()].getIsBlack();
+    return (*board[location.getLocation()]).getIsBlack();
 }
 
 bool Board::isNotBlack(Position location) const {
-    if (board[location.getLocation()].getIsEmpty()) {
+    if ((*board[location.getLocation()]).getIsEmpty()) {
         return true;
     }
     
@@ -63,9 +63,6 @@ void Board::drawBoard(const Interface& ui, const vector <Position>& possible){
     (*gout).drawHover(ui.getHoverPosition());
     (*gout).drawSelected(ui.getSelectPosition());
 
-    // draw the possible moves
-    std::vector<int> possible;
-
     // Iterate through the vector using range-based for loop
     for (int value : possible) {
         (*gout).drawPossible(value);
@@ -73,7 +70,7 @@ void Board::drawBoard(const Interface& ui, const vector <Position>& possible){
 
     // draw the pieces
     for (int i = 0; i < board.size(); i++){
-        board[i].drawPiece(i);
+        (*board[i]).drawPiece(i);
     }
 }
 

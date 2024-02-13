@@ -37,16 +37,16 @@ char Piece::getSymbol() const {
 	return symbol;
 }
 
-tuple<Position, Board> Piece::standardMove(const Position& location, const Position& newLocation, const Board& board) const{
-    // create a copy of board
-    Board tempBoard = Board(board);
+tuple<Position, Board> Piece::standardMove(const Position& location, const Position& newLocation, Board& boardInput) const{
 
-    // set the location the piece moves from as empty
+
+    Board tempBoard(boardInput);
+
     tempBoard[location] = EmptySpace();
 
     // set the location the piece moves to as the piece.
-    tempBoard[newLocation] = board[location];
+    tempBoard[newLocation] = boardInput[location];
 
     // construct the output and return it.
-    return make_tuple(newLocation, tempBoard);
+    return make_tuple(newLocation, boardInput);
 }

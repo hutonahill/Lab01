@@ -17,8 +17,6 @@ public:
 
 	Board();
 
-	vector<Piece*> board;
-
 	bool isWhite(Position location) const;
 
 	bool isNotWhite(Position location) const;
@@ -47,5 +45,6 @@ public:
 
 private:
 	ogstream* gout;
+	vector<Piece*> board;
 };
 

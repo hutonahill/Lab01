@@ -62,7 +62,7 @@ public:
 	
 
 protected:
-	tuple<Position, Board> standardMove(const Position& location, const Position& newLocation, const Board& board) const;
+	tuple<Position, Board> standardMove(const Position& location, const Position& newLocation, Board& board) const;
 	ogstream* gout;
 
 private:
