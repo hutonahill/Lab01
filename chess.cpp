@@ -217,23 +217,28 @@ void callBack(Interface *pUI, void * p)
    // the first step is to cast the void pointer into a game object. This
    // is the first step of every single callback function in OpenGL. 
 
+    Position oldPosition(pUI->getPreviousPosition());
+    Position targetPosition(pUI->getSelectPosition());
 
+    if (targetPosition.isValid() == true) {
+        // move 
+        bool success = move(myBoard, oldPosition, targetPosition);
 
-   // move 
-    bool success = move(myBoard, Position(pUI->getPreviousPosition()), Position(pUI->getSelectPosition()));
-    if (success){
-        pUI->clearSelectPosition();
-    }
+        if (success) {
+            pUI->clearSelectPosition();
+        }
 
-    else{
-
-        possible = myBoard[Position(pUI->getSelectPosition())].getPossibleMoves(Position(pUI->getSelectPosition()), myBoard);
+        else {
+            possible = myBoard[targetPosition].getPossibleMoves(targetPosition, myBoard);
+        }
     }
 
     // if we clicked on a blank spot, then it is not selected
-    if (pUI->getSelectPosition() != -1 && myBoard[Position(pUI->getSelectPosition())] == EmptySpace()) {
+    if (targetPosition != -1 && myBoard[targetPosition] == EmptySpace()) {
         pUI->clearSelectPosition();
     }
+
+    
 
     vector<Position> possibleLocations = vector<Position>();
 

@@ -11,37 +11,44 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
     vector<tuple<Position, Board>> possible;
     int c;
     int r;
+    int row = currentPosition.getRow();
+    int col = currentPosition.getCol();
+
     Position newLocation;
 
     static EmptySpace empty = EmptySpace();
 
-    if (Piece::getIsBlack() == false) {
+    bool isBlack = Piece::getIsBlack();
+
+    if (isBlack == false) {
+
+        
 
         // move forward 2 blank spaces
-        c = currentPosition.getCol();
-        r = currentPosition.getRow() - 2;
-        newLocation.setXY(r, c);
-        if (currentPosition.getRow() == 6 && board[newLocation.getLocation()] == empty) {
+        c = col;
+        r = row - 2;
+        newLocation.set(r, c);
+        if (row == 6 && board[newLocation.getLocation()] == empty) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // move forward one blank spaces
-        r = currentPosition.getRow() - 1;
-        newLocation.setXY(r, c);
+        r = row - 1;
+        newLocation.set(r, c);
         if (r >= 0 && board[newLocation.getLocation()] == empty) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // attack left
-        c = currentPosition.getCol() - 1;
-        newLocation.setXY(r, c);
+        c = col - 1;
+        newLocation.set(r, c);
         if (board.isWhite(newLocation)) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // attack right
-        c = currentPosition.getCol() + 1;
-        newLocation.setXY(r, c);
+        c = col + 1;
+        newLocation.set(r, c);
         if (board.isWhite(newLocation)) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
@@ -49,12 +56,12 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
         // what about en-passant and pawn promotion
 
         // Pawn Promotion covered in move()
-        if (currentPosition.getRow() == 3) {
+        if (row == 3) {
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(1, col - 1)
-            if (currentPosition.getCol() > 0 && board[currentPosition.getLocation() - 1].getSymbol() == blackSymbol) {
-                newLocation.setXY(2, currentPosition.getCol() - 1);
+            if (col > 0 && board[currentPosition.getLocation() - 1].getSymbol() == blackSymbol) {
+                newLocation.set(2, col - 1);
 
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
@@ -68,9 +75,9 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(1, col + 1)
-            if (currentPosition.getCol() < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
+            if (col < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
 
-                newLocation.setXY(2, currentPosition.getCol() + 1);
+                newLocation.set(2, col + 1);
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
@@ -83,30 +90,34 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
         }
     }
         
-    else if (Piece::getIsBlack() == true) {
+    else if (isBlack == true) {
 
         // forward two blank spaces
-        c = currentPosition.getCol();
-        r = currentPosition.getRow() + 2;
-        newLocation.setXY(r, c);
-        if (currentPosition.getRow() == 1 && board[newLocation] == ' ')
+        c = col;
+        r = row + 2;
+        newLocation.set(c, r);
+        int tempLocation = newLocation;
+        char targetPiece = board[tempLocation];
+        if (row == 1 && targetPiece == ' '){
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
+        }
 
         // forward one blank space
-        r = currentPosition.getRow() + 1;
-        newLocation.setXY(r, c);
-        if (r < 8 && board[newLocation] == ' ')
+        r = row + 1;
+        newLocation.set(r, c);
+        if (r < 8 && board[newLocation] == ' '){
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
+        }
 
         // attack left
-        c = currentPosition.getCol() - 1;
-        newLocation.setXY(r, c);
+        c = col - 1;
+        newLocation.set(r, c);
         if (board.isBlack(newLocation))
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
 
         // attack right
-        c = currentPosition.getCol() + 1;
-        newLocation.setXY(r, c);
+        c = col + 1;
+        newLocation.set(r, c);
         if (board.isBlack(newLocation))
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
 
@@ -116,9 +127,9 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(6, col - 1)
-            if (currentPosition.getCol() > 0 && board[currentPosition.getLocation() - 1] == whtieSymbol) {
+            if (col > 0 && board[currentPosition.getLocation() - 1] == whtieSymbol) {
                 // Add the en passant move
-                newLocation.setXY(5, currentPosition.getCol() - 1);
+                newLocation.set(5, currentPosition.getCol() - 1);
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
@@ -130,8 +141,8 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(6, col + 1)
-            if (currentPosition.getCol() < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
-                newLocation.setXY(5, currentPosition.getCol() + 1);
+            if (col < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
+                newLocation.set(5, currentPosition.getCol() + 1);
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
@@ -142,7 +153,9 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
                 possible.emplace_back(output);
             }
         }
-
+    }
+    else {
+        throw invalid_argument("ERROR: unreachable state reached! Pawn is nether black nor white.");
     }
 
     return possible;

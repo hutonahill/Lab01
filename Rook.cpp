@@ -29,7 +29,7 @@ vector<tuple<Position, Board>> Rook::getPossibleMoves(const Position& currentPos
         r = row + moves[i].row;
         c = col + moves[i].col;
 
-        newLocation.setXY(r, c);
+        newLocation.set(r, c);
         while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
             board[newLocation] == ' ')
         {
@@ -37,7 +37,7 @@ vector<tuple<Position, Board>> Rook::getPossibleMoves(const Position& currentPos
 
             r += moves[i].row;
             c += moves[i].col;
-            newLocation.setXY(r, c);
+            newLocation.set(r, c);
         }
         if (amBlack && board.isNotBlack(newLocation)) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));

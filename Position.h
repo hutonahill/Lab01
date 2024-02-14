@@ -102,6 +102,7 @@ public:
     bool operator <  (const int& rhs) const { return getLocation() < rhs; }
     bool operator == (const Position& rhs) const;
     bool operator != (const Position& rhs) const;
+    bool operator != (const int& rhs) const;
     const Position& operator =  (const Position& rhs);
     const Position& operator =  (const char* rhs);
     const Position& operator =  (const string& rhs)

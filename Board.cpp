@@ -87,19 +87,49 @@ Board& Board::operator=(const Board& other) {
 }
 
 const Piece& Board::operator[](const Position& position) const {
-    return *board[position.getLocation()];
+    int index = position.getLocation();
+    if (index >= 0 && index < board.size()) {
+        return *board[index];
+    }
+    else {
+        string errorMsg = "index `" + to_string(index) + "` is out of range for the board array. ";
+
+        throw out_of_range(errorMsg);
+    }
 }
 
 Piece& Board::operator[](const Position& position) {
-    return *board[position.getLocation()];
+    int index = position.getLocation();
+    if (index >= 0 && index < board.size()) {
+        return *board[index];
+    }
+    else {
+        string errorMsg = "index `" + to_string(index) + "` is out of range for the board array. ";
+
+        throw out_of_range(errorMsg);
+    }
 }
 
 const Piece& Board::operator[](const int& positionInt) const {
-    return *board[positionInt];
+    if (positionInt >= 0 && positionInt < board.size()) {
+        return *board[positionInt];
+    }
+    else {
+        string errorMsg = "index `" + to_string(positionInt) + "` is out of range for the board array. ";
+
+        throw out_of_range(errorMsg);
+    }
 }
 
 Piece& Board::operator[](const int& positionInt) {
-    return *board[positionInt];
+    if (positionInt >= 0 && positionInt < board.size()) {
+        return *board[positionInt];
+    }
+    else {
+        string errorMsg = "index `" + to_string(positionInt) + "` is out of range for the board array. ";
+
+        throw out_of_range(errorMsg);
+    }
 }
 
 Board::operator const char* () const {

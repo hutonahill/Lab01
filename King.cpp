@@ -32,7 +32,7 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
     for each (RC space in moves) {
         r = row + space.row;
         c = col + space.col;
-        newLocation.setXY(r, c);
+        newLocation.set(r, c);
         if (amBlack && board.isNotBlack(newLocation)) {
             kingMoves.emplace_back(standardMove(currentPosition, newLocation, board));
         }
@@ -58,7 +58,7 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
                 board[Position(row, 0)] == empty &&
                 board[Position(row, 0)] == empty &&
                 board[Position(row, 0)] == empty) {
-                newLocation.setXY(row, 2);
+                newLocation.set(row, 2);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
@@ -75,7 +75,7 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
             if (board[Position(row, 7)] == blackRook &&
                 board[Position(row, 6)] == empty &&
                 board[Position(row, 5)] == empty) {
-                newLocation.setXY(row, 6);
+                newLocation.set(row, 6);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
@@ -103,7 +103,7 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
                 board[Position(row, 1)] == empty &&
                 board[Position(row, 2)] == empty &&
                 board[Position(row, 3)] == empty) {
-                newLocation.setXY(row, 2);
+                newLocation.set(row, 2);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
@@ -120,7 +120,7 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
             if (board[Position(row, 7)] == whiteRook &&
                 board[Position(row, 6)] == empty &&
                 board[Position(row, 5)] == empty) {
-                newLocation.setXY(row, 6);
+                newLocation.set(row, 6);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 

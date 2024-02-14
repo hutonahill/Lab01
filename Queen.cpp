@@ -29,7 +29,7 @@ vector<tuple<Position, Board>> Queen::getPossibleMoves(const Position& currentPo
     {
         r = row + space.row;
         c = col + space.col;
-        newLocation.setXY(r, c);
+        newLocation.set(r, c);
 
         // loop though every space in the current direction
         while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
@@ -43,7 +43,7 @@ vector<tuple<Position, Board>> Queen::getPossibleMoves(const Position& currentPo
             // ideratate the dierection 
             r += space.row;
             c += space.col;
-            newLocation.setXY(r, c);
+            newLocation.set(r, c);
         }
 
         // if the above loop stoped due to hitting a enemy peice

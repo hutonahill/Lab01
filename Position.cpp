@@ -33,6 +33,11 @@ bool Position::operator != (const Position& rhs) const
         return rhs.location != location;
 }
 
+bool Position::operator != (const int& rhs) const
+{
+    return location != rhs;
+}
+
 /***********************************************
  * POSITION : EQUALITY
  **********************************************/

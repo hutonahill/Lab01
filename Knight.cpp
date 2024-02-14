@@ -24,7 +24,7 @@ vector<tuple<Position, Board>> Knight::getPossibleMoves(const Position& currentP
 
         int r = currentPosition.getRow() + space.row;
         int c = currentPosition.getRow() + space.col;
-        newLocation.setXY(r, c);
+        newLocation.set(r, c);
 
         if (Piece::getIsBlack() && board.isNotBlack(newLocation))
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
