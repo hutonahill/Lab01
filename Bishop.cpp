@@ -5,7 +5,7 @@
 char Bishop::blackSymbol = blackBishop;
 char Bishop::whiteSymbol = whiteBishop;
 
-vector<tuple<Position, Board>> Bishop::getPossibleMoves(const Position& currentPosition, const Board& board) const {
+vector<tuple<Position, Board>> Bishop::getPossibleMoves(const Position& currentPosition, const Board& board, const bool isBlackMove) const {
     int r;
     int c;
 
@@ -14,11 +14,15 @@ vector<tuple<Position, Board>> Bishop::getPossibleMoves(const Position& currentP
 
     Position newLocation = Position();
 
-    EmptySpace empty = EmptySpace();
+    Piece * empty = new EmptySpace();
 
     bool amBlack = Piece::getIsBlack();
     
     vector<tuple<Position, Board>> possible;
+
+    if (amBlack != isBlackMove) {
+        return possible;
+    }
     
     RC moves[4] =
     {
@@ -29,21 +33,24 @@ vector<tuple<Position, Board>> Bishop::getPossibleMoves(const Position& currentP
 
         r = row + moves[i].row;
         c = col + moves[i].col;
-        newLocation.set(r, c);
-        while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
-            board[newLocation] == ' ') {
+        newLocation = Position(r, c);
+
+        while (newLocation.isValid() &&
+            board[newLocation].getIsEmpty()) {
 
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
             r += moves[i].row;
             c += moves[i].col;
-            newLocation.set(r, c);
+            newLocation = Position(r, c);
+            
         }
-
-        if (amBlack && board.isNotBlack(newLocation)) {
-            possible.emplace_back(standardMove(currentPosition, newLocation, board));
-        }
-        if (!amBlack && board.isNotWhite(newLocation)) {
-            possible.emplace_back(standardMove(currentPosition, newLocation, board));
+        if (newLocation.isValid()){
+            if (amBlack && board.isNotBlack(newLocation)) {
+                possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
+            if (!amBlack && board.isNotWhite(newLocation)) {
+                possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
         }
     }
 

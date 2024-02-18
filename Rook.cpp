@@ -4,19 +4,23 @@
 char Rook::blackSymbol = blackRook;
 char Rook::whiteSymbol = whiteRook;
 
-vector<tuple<Position, Board>> Rook::getPossibleMoves(const Position& currentPosition, const Board& board) const {
+vector<tuple<Position, Board>> Rook::getPossibleMoves(const Position& currentPosition, const Board& board, const bool isBlackMove) const {
     int r;
     int c;
-    int row = currentPosition.getRow();
-    int col = currentPosition.getCol();
+    const int row = currentPosition.getRow();
+    const int col = currentPosition.getCol();
 
-    bool amBlack = Piece::getIsBlack();
+    const bool amBlack = Piece::getIsBlack();
 
     vector<tuple<Position, Board>> possible;
 
+    if (amBlack != isBlackMove) {
+        return possible;
+    }
+
     Position newLocation = Position();
 
-    EmptySpace empty = EmptySpace();
+    const Piece* empty = new EmptySpace();
     
     RC moves[4] ={
                 {0,  1},
@@ -29,22 +33,27 @@ vector<tuple<Position, Board>> Rook::getPossibleMoves(const Position& currentPos
         r = row + moves[i].row;
         c = col + moves[i].col;
 
-        newLocation.set(r, c);
-        while (r >= 0 && r < 8 && c >= 0 && c < 8 &&
-            board[newLocation] == ' ')
+        newLocation = Position(r, c);
+        while (newLocation.isValid() &&
+            board[newLocation].getIsEmpty())
         {
-            possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            if (newLocation.isValid()) {
+                possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
+            
 
             r += moves[i].row;
             c += moves[i].col;
-            newLocation.set(r, c);
+            newLocation = Position(r, c);
         }
-        if (amBlack && board.isNotBlack(newLocation)) {
-            possible.emplace_back(standardMove(currentPosition, newLocation, board));
-        }
+        if (newLocation.isValid()){
+            if (amBlack && board.isNotBlack(newLocation)) {
+                possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
 
-        if (!amBlack && board.isNotWhite(newLocation)) {
-            possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            if (!amBlack && board.isNotWhite(newLocation)) {
+                possible.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
         }
     }
 

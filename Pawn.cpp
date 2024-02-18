@@ -2,155 +2,156 @@
 #include "Position.h"
 #include "EmptySpace.h"
 
-char Pawn::blackSymbol = 'P';
-char Pawn::whtieSymbol = tolower(Pawn::blackSymbol);
+char Pawn::blackSymbol = Piece::blackPawn;
+char Pawn::whtieSymbol = Piece::whitePawn;
 
 
-vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPosition, const Board& board) const {
+vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPosition, const Board& board, const bool isBlackMove) const {
     
     vector<tuple<Position, Board>> possible;
     int c;
     int r;
-    int row = currentPosition.getRow();
-    int col = currentPosition.getCol();
+    const int row = currentPosition.getRow();
+    const int col = currentPosition.getCol();
 
     Position newLocation;
 
-    static EmptySpace empty = EmptySpace();
+    const Piece* empty = new EmptySpace();
 
-    bool isBlack = Piece::getIsBlack();
+    bool amBlack = Piece::getIsBlack();
 
-    if (isBlack == false) {
+    if (amBlack != isBlackMove) {
+        return possible;
+    }
+
+    if (amBlack == false) {
 
         
 
         // move forward 2 blank spaces
         c = col;
         r = row - 2;
-        newLocation.set(r, c);
-        if (row == 6 && board[newLocation.getLocation()] == empty) {
+        newLocation = Position(r, c);
+        if (row == 6 && board[newLocation.getLocation()].getIsEmpty() == true) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // move forward one blank spaces
         r = row - 1;
-        newLocation.set(r, c);
-        if (r >= 0 && board[newLocation.getLocation()] == empty) {
+        newLocation = Position(r, c);
+        if (r >= 0 && board[newLocation.getLocation()].getIsEmpty() == true) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // attack left
         c = col - 1;
-        newLocation.set(r, c);
-        if (board.isWhite(newLocation)) {
+        newLocation = Position(r, c);
+        if (newLocation.isValid() && board[newLocation].getIsBlack() && !board[newLocation].getIsEmpty()) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // attack right
         c = col + 1;
-        newLocation.set(r, c);
-        if (board.isWhite(newLocation)) {
+        newLocation = Position(r, c);
+        if (newLocation.isValid() && board[newLocation].getIsBlack() && !board[newLocation].getIsEmpty()) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // what about en-passant and pawn promotion
-
-        // Pawn Promotion covered in move()
         if (row == 3) {
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(1, col - 1)
             if (col > 0 && board[currentPosition.getLocation() - 1].getSymbol() == blackSymbol) {
-                newLocation.set(2, col - 1);
+                newLocation = Position(2, col - 1);
 
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
+                
+                tempBoard.set(currentPosition.getLocation() - 1, empty);
 
-                tempBoard[currentPosition.getLocation() - 1] = empty;
-
-                possible.emplace_back(output);
+                possible.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
 
-            // impliment this condition later after we impliment move history:
-                // lastMove.from == convertToLocation(1, col + 1)
             if (col < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
 
-                newLocation.set(2, col + 1);
+                newLocation = Position(2, col + 1);
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
 
-                tempBoard[currentPosition.getLocation() + 1] = empty;
-
-                possible.emplace_back(output);
+                tempBoard.set(currentPosition.getLocation() + 1, empty);
+                
+                possible.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
         }
     }
         
-    else if (isBlack == true) {
+    else if (amBlack == true) {
 
         // forward two blank spaces
+        int currentLocationInt = currentPosition;
         c = col;
         r = row + 2;
-        newLocation.set(c, r);
+        newLocation = Position(r, c);
         int tempLocation = newLocation;
-        char targetPiece = board[tempLocation];
-        if (row == 1 && targetPiece == ' '){
+        char targetPiece = board[tempLocation].getSymbol();
+        if (row == 1 && board[tempLocation].getIsEmpty() == true) {
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // forward one blank space
         r = row + 1;
-        newLocation.set(r, c);
-        if (r < 8 && board[newLocation] == ' '){
+        newLocation = Position(r, c);
+        if (r < 8 && board[newLocation].getIsEmpty()){
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
         }
 
         // attack left
         c = col - 1;
-        newLocation.set(r, c);
-        if (board.isBlack(newLocation))
+        newLocation = Position(r, c);
+        if (newLocation.isValid() && !board[newLocation].getIsBlack() && !board[newLocation].getIsEmpty())
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
 
         // attack right
         c = col + 1;
-        newLocation.set(r, c);
-        if (board.isBlack(newLocation))
+        newLocation = Position(r, c);
+        if (newLocation.isValid() && !board[newLocation].getIsBlack() && !board[newLocation].getIsEmpty())
             possible.emplace_back(standardMove(currentPosition, newLocation, board));
 
         // what about en-passant and pawn promotion?
 
-        if (Piece::getIsBlack() == 4) {
+        if (row == 4) {
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(6, col - 1)
             if (col > 0 && board[currentPosition.getLocation() - 1] == whtieSymbol) {
                 // Add the en passant move
-                newLocation.set(5, currentPosition.getCol() - 1);
+                newLocation = Position(5, currentPosition.getCol() - 1);
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
 
-                tempBoard[currentPosition.getLocation() - 1] = empty;
+                tempBoard.set(currentPosition.getLocation() - 1, empty);
 
-                possible.emplace_back(output);
+                possible.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
 
             // impliment this condition later after we impliment move history:
                 // lastMove.from == convertToLocation(6, col + 1)
             if (col < 7 && board[currentPosition.getLocation() + 1] == blackSymbol) {
-                newLocation.set(5, currentPosition.getCol() + 1);
+                newLocation = Position(5, currentPosition.getCol() + 1);
                 // Add the en passant move
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
 
-                tempBoard[currentPosition.getLocation() + 1] = empty;
+                tempBoard.set(currentPosition.getLocation() + 1, empty);
 
-                possible.emplace_back(output);
+                possible.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
         }
     }
@@ -163,5 +164,6 @@ vector<tuple<Position, Board>> Pawn::getPossibleMoves(const Position& currentPos
 }
 
 void Pawn::drawPiece(int rawLocation) const {
-    Piece::gout->drawPawn(rawLocation, getIsBlack());
+    bool isBlack = Piece::getIsBlack();
+    Piece::gout->drawPawn(rawLocation, isBlack);
 }

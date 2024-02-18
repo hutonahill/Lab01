@@ -4,22 +4,26 @@
 char King::blackSymbol = blackKing;
 char King::whiteSymbol = whiteKing;
 
-vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPosition, const Board& board) const {
+vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPosition, const Board& board, const bool isBlackMove) const {
     
     int r;
     int c;
 
-    int row = currentPosition.getRow();
-    int col = currentPosition.getCol();
+    const int row = currentPosition.getRow();
+    const int col = currentPosition.getCol();
 
     Position newLocation = Position();
 
-    EmptySpace empty = EmptySpace();
+    const Piece* empty = new EmptySpace();
 
-    bool amBlack = Piece::getIsBlack();
+    const bool amBlack = Piece::getIsBlack();
     
     vector<tuple<Position, Board>> kingMoves;
-    vector <tuple<int, char*>> possible;
+    vector<tuple<Position, Board>> possible;
+
+    if (amBlack != isBlackMove) {
+        return possible;
+    }
 
     RC moves[8] =
     {
@@ -32,13 +36,15 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
     for each (RC space in moves) {
         r = row + space.row;
         c = col + space.col;
-        newLocation.set(r, c);
-        if (amBlack && board.isNotBlack(newLocation)) {
-            kingMoves.emplace_back(standardMove(currentPosition, newLocation, board));
-        }
-
-        if (!amBlack && board.isNotWhite(newLocation)) {
-            kingMoves.emplace_back(standardMove(currentPosition, newLocation, board));
+        newLocation = Position(r, c);
+        //bool MoveInCheck = board.inCheck(newLocation, !amBlack);
+        if (newLocation.isValid() //&& !MoveInCheck
+            ){
+            
+            if (amBlack != board[newLocation].getIsBlack() || 
+                board[newLocation].getIsEmpty()) {
+                kingMoves.emplace_back(standardMove(currentPosition, newLocation, board));
+            }
         }
     }
 
@@ -54,37 +60,54 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
             // has been implimented.
 
             // Quean Side
-            if (board[Position(row, 0)] == blackRook &&
-                board[Position(row, 0)] == empty &&
-                board[Position(row, 0)] == empty &&
-                board[Position(row, 0)] == empty) {
-                newLocation.set(row, 2);
+            Position pos1 = Position(row, 0);
+            Position pos2 = Position(row, 1);
+            Position pos3 = Position(row, 2);
+            Position pos4 = Position(row, 3);
+
+            if (board[pos1] == blackRook &&
+                //!board.inCheck(pos1, !amBlack) &&
+                board[pos2].getIsEmpty() &&
+                //!board.inCheck(pos2, !amBlack) &&
+                board[pos3].getIsEmpty() &&
+                //!board.inCheck(pos3, !amBlack) &&
+                board[pos4].getIsEmpty() //&&
+                //!board.inCheck(pos4, !amBlack)
+                ) {
+                newLocation = Position(row, 2);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
 
-                tempBoard[Position(row, 0)] = empty;
-                tempBoard[Position(row, 3)] = board[Position(row, 0)];
+   
+                tempBoard.set(pos1, empty);
+                tempBoard.set(pos4, &board[pos1] );
 
-                kingMoves.emplace_back(output);
+                kingMoves.emplace_back(make_tuple(get<0>(output), tempBoard));
 
             }
 
             // King Side
-            if (board[Position(row, 7)] == blackRook &&
-                board[Position(row, 6)] == empty &&
-                board[Position(row, 5)] == empty) {
-                newLocation.set(row, 6);
+            pos1 = Position(row, 7);
+            pos2 = Position(row, 6);
+            pos3 = Position(row, 5);
+            if (board[pos1] == blackRook &&
+                //!board.inCheck(pos1, !amBlack) &&
+                board[pos2].getIsEmpty() &&
+                //!board.inCheck(pos2, !amBlack) &&
+                board[pos3].getIsEmpty() //&&
+                //!board.inCheck(pos3, !amBlack)
+                ) {
+                newLocation = Position(row, 6);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
+                tempBoard.set(pos1, empty);
+                tempBoard.set(pos3, &board[pos1] );
 
-                tempBoard[Position(row, 7)] = empty;
-                tempBoard[Position(row, 5)] = board[Position(row, 7)];
-
-                kingMoves.emplace_back(output);
+                kingMoves.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
         }
     }
@@ -99,36 +122,54 @@ vector<tuple<Position, Board>> King::getPossibleMoves(const Position& currentPos
             // has been implimented.
 
             // Quean Side
-            if (board[Position(row, 0)] == whiteRook &&
-                board[Position(row, 1)] == empty &&
-                board[Position(row, 2)] == empty &&
-                board[Position(row, 3)] == empty) {
-                newLocation.set(row, 2);
+            Position pos1 = Position(row, 0);
+            Position pos2 = Position(row, 1);
+            Position pos3 = Position(row, 2);
+            Position pos4 = Position(row, 3);
+
+            if (board[pos1] == whiteRook &&
+                //!board.inCheck(pos1, !amBlack) &&
+                board[pos2].getIsEmpty() &&
+                //!board.inCheck(pos2, !amBlack) &&
+                board[pos3].getIsEmpty() &&
+                //!board.inCheck(pos3, !amBlack) &&
+                board[pos4].getIsEmpty() //&&
+                //!board.inCheck(pos4, !amBlack)
+                ) {
+
+                newLocation = Position(row, 2);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
 
-                tempBoard[Position(row, 0)] = empty;
-                tempBoard[Position(row, 3)] = board[Position(row, 0)];
+                tempBoard.set(pos1, empty);
+                tempBoard.set(pos4, &board[pos1]);
 
-                kingMoves.emplace_back(output);
+                kingMoves.emplace_back(make_tuple(get<0>(output), tempBoard));
 
             }
 
             // King Side
-            if (board[Position(row, 7)] == whiteRook &&
-                board[Position(row, 6)] == empty &&
-                board[Position(row, 5)] == empty) {
-                newLocation.set(row, 6);
+            pos1 = Position(row, 7);
+            pos2 = Position(row, 6);
+            pos3 = Position(row, 5);
+            if (board[pos1] == whiteRook &&
+                //!board.inCheck(pos1, !amBlack) &&
+                board[pos2].getIsEmpty() &&
+                //!board.inCheck(pos2, !amBlack) &&
+                board[pos3].getIsEmpty() //&&
+                //!board.inCheck(pos3, !amBlack)
+                ) {
+                newLocation = Position(row, 6);
 
                 tuple<Position, Board> output = standardMove(currentPosition, newLocation, board);
 
                 Board tempBoard = get<1>(output);
-
-                tempBoard[Position(row, 7)] = empty;
-                tempBoard[Position(row, 5)] = board[Position(row, 7)];
-                kingMoves.emplace_back(output);
+                
+                tempBoard.set(pos1, empty);
+                tempBoard.set(pos3, &board[pos1]);
+                kingMoves.emplace_back(make_tuple(get<0>(output), tempBoard));
             }
         }
     }

@@ -77,11 +77,9 @@ void Board::drawBoard(const Interface& ui, const vector <Position>& possible){
 
 Board& Board::operator=(const Board& other) {
     if (this != &other) {  // Check for self-assignment
-        // Deallocate existing resources if needed
-
-        // Call the copy constructor for deep copy
-        Board temp(other);
-        swap(*this, temp);  // Use the swap idiom for efficient assignment
+        
+        board = other.board;  
+        gout = other.gout;
     }
     return *this;
 }
@@ -135,8 +133,9 @@ Piece& Board::operator[](const int& positionInt) {
 Board::operator const char* () const {
     // Create a string by concatenating the char representation of each Piece
     std::string result;
-    for (const Piece* piece : board) {
-        result += static_cast<char>(*piece);
+
+    for (int i = 0; i < board.size(); i++){
+        result += static_cast<char>(*board[i]);
     }
 
     // Allocate memory for the char array and copy the string content
@@ -145,3 +144,48 @@ Board::operator const char* () const {
 
     return charArray;
 }
+
+
+bool Board::inCheck(const Position location, bool blackAttacking) const {
+    // Check if any opponent's piece can attack the king
+    for (int i = 0; i < 64; ++i)
+    {
+        if ((blackAttacking && !board[i]->getIsBlack()) || (!blackAttacking && board[i]->getIsBlack())){
+            vector<tuple<Position, Board>> possibleMoves = board[i]->getPossibleMoves(Position(i), const_cast<Board*>(this), blackAttacking);
+            for each (tuple<Position, Board> move in possibleMoves){
+                if (get<0>(move) == location) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false; // King is not in check
+}
+// no need to check for checkmate as the game will be frozen if 
+/*
+bool isCheckmate(const char* board, bool isBlackTurn)
+{
+    // Check if the king is in check
+    if (!isCheck(board, isBlackTurn))
+        return false; // King is not in check, so not checkmate
+
+    // Check if the king has any legal moves to escape check
+    for (int i = 0; i < 64; ++i)
+    {
+        if ((isBlackTurn && board[i].getIsBlack()) || (!isBlackTurn && isWhite(board, i)))
+        {
+            set<int> possibleMoves = getPossibleMoves(board, i);
+            for (int move : possibleMoves)
+            {
+                char tempBoard[64];
+                memcpy(tempBoard, board, sizeof(char) * 64);
+                tempBoard[move] = tempBoard[i];
+                tempBoard[i] = ' ';
+                if (!isCheck(tempBoard, isBlackTurn))
+                    return false; // King has at least one legal move to escape check
+            }
+        }
+    }
+    return true; // King is in checkmate
+}
+*/

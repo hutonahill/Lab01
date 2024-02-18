@@ -37,11 +37,17 @@ public:
 	static const char whiteQueen = 'q';
 	static const char whiteKing = 'k';
 
-	virtual vector<tuple<Position, Board>> getPossibleMoves(const Position& currentPosition, const Board& board) const = 0;
+	const char emptySpace = '5';
+
+	virtual vector<tuple<Position, Board>> getPossibleMoves(const Position& currentPosition, const Board& board, const bool isBlackMove) const = 0;
 	
 	virtual void drawPiece(int rawLocation) const = 0;
 
 	Piece(bool isBlackInput, char symbolInput, ogstream* goutInput);
+	Piece(bool isBlackInput, char symbolInput, ogstream* goutInput, bool IsEmptyInput) : 
+		Piece(isBlackInput, symbolInput, goutInput) {
+		isEmpty = IsEmptyInput;
+	}
 	Piece();
 	Piece(Piece* oldPiece);
 

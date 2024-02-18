@@ -42,10 +42,12 @@ vector<Piece*> startingBoard = vector<Piece*>{
 
 Board myBoard = Board(gout, startingBoard);
 
+bool BlackMove = false;
+
 
 bool checkPromotion(const Board board, Position position) {
     // Assuming position is a valid index (0 to 63) in the board array
-    int row = position / 8;
+    const int row = position.getRow();
 
     // Check if the pawn is in a promotion position
     if ((board[position] == 'P' && row == 0) || (board[position] == 'p' && row == 7)) {
@@ -121,19 +123,73 @@ string input(const string& prompt) {
  * MOVE
  * Execute one movement. Return TRUE if successful
  *********************************************/
+bool checkCheck(Board& board, Position& positionFrom) {
+    bool isMovingBlack = board[positionFrom].getIsBlack();
+    bool isMovingKing = false;
+    if (isMovingBlack && board[positionFrom] == Piece::blackKing) {
+        isMovingKing = true;
+    }
+    else if (!isMovingBlack && board[positionFrom] == Piece::whiteKing) {
+        isMovingKing = true;
+    }
+
+    if (isMovingKing == false) {
+        // find the frendly king
+        Position frendlyKing = Position();
+        bool foundKing = false;
+        int boardSize = 64;
+        for (int i = 0; i < boardSize; i++) {
+            if (isMovingBlack && board[i] == Piece::blackKing) {
+                foundKing = true;
+                frendlyKing = Position(i);
+                i = boardSize;
+            }
+            else if (!isMovingBlack && board[i] == Piece::whiteKing) {
+                foundKing = true;
+                frendlyKing = Position(i);
+                i = boardSize;
+            }
+        }
+
+        if (foundKing == true) {
+            if (board.inCheck(frendlyKing, !isMovingBlack) == true) {
+                return true;
+            }
+        }
+
+        // if no frendly king was found the game is over.
+        else {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool move(Board& board, Position& positionFrom, Position& positionTo) {
     // do not move if a move was not indicated
     if (positionFrom.getLocation() == -1 || positionTo.getLocation() == -1) {
         return false;
     }
+    else if (positionFrom.getLocation() == -1) {
+        return false;
+    }
     assert(positionFrom.getLocation() >= 0 && positionFrom.getLocation() < 64);
     assert(positionTo.getLocation() >= 0 && positionTo.getLocation() < 64);
 
-
+    /* This crashes the program and i dont have time to figure out why. to many things to iderate though
+    * its also in the wrong place. we should be implimenting it in getPossibleMoves.
+     
+    // check for check
+    if (checkCheck(board, positionFrom) == true) {
+        return false;
+    }
+    */
+    
 
 
     // find the set of possible moves from our current location
-    vector <tuple<Position, Board>> possiblePrevious = board[positionFrom].getPossibleMoves(positionFrom, board);
+    vector <tuple<Position, Board>> possiblePrevious = board[positionFrom].getPossibleMoves(positionFrom, board, BlackMove);
 
     bool moveIsValid = false;
 
@@ -142,7 +198,7 @@ bool move(Board& board, Position& positionFrom, Position& positionTo) {
     for each (tuple<Position, Board> move in possiblePrevious) {
         if (get<0>(move) == positionTo) {
             moveIsValid = true;
-            newBoard = get<1>(move);
+            newBoard = Board(get<1>(move));
         }
     }
 
@@ -190,7 +246,7 @@ bool move(Board& board, Position& positionFrom, Position& positionTo) {
 
             bool isBlack = board[positionTo].getIsBlack();
 
-            board[positionTo] = Queen(isBlack, board.getGout());
+            board.set(positionTo, (new Queen(isBlack, board.getGout())));
 
         }
 
@@ -220,26 +276,36 @@ void callBack(Interface *pUI, void * p)
     Position oldPosition(pUI->getPreviousPosition());
     Position targetPosition(pUI->getSelectPosition());
 
+    
+
     if (targetPosition.isValid() == true) {
+
+        
         // move 
         bool success = move(myBoard, oldPosition, targetPosition);
 
         if (success) {
             pUI->clearSelectPosition();
+
+            // change turns
+            BlackMove = !BlackMove;
         }
 
         else {
-            possible = myBoard[targetPosition].getPossibleMoves(targetPosition, myBoard);
+            possible = myBoard[targetPosition].getPossibleMoves(targetPosition, myBoard, BlackMove);
         }
+        
     }
 
     // if we clicked on a blank spot, then it is not selected
-    if (targetPosition != -1 && myBoard[targetPosition] == EmptySpace()) {
-        pUI->clearSelectPosition();
+    if (targetPosition != -1) {
+        char emptySymbol = EmptySpace().getSymbol();
+        char targetSymbol = myBoard[targetPosition];
+        if (targetPosition != -1 && targetSymbol == emptySymbol) {
+            pUI->clearSelectPosition();
+        }
     }
-
-    
-
+   
     vector<Position> possibleLocations = vector<Position>();
 
    for each (tuple<Position, Board> move in possible)

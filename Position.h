@@ -67,7 +67,7 @@ public:
     // Mutators
     void setRow(int r)
     {
-        if (r >= 0 && r < 8 && isValid())
+        if (r >= 0 && r < squareHeight && isValid())
         {
             char c = getCol();
             location = (char)r * 8 + c;

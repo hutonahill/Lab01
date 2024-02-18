@@ -22,7 +22,7 @@ Piece::Piece(Piece* oldPiece) {
 
 Piece::Piece() {
     isBlack = false;
-    symbol = ' ';
+    symbol = emptySpace;
     isEmpty = true;
 }
 
@@ -38,16 +38,19 @@ char Piece::getSymbol() const {
 	return symbol;
 }
 
-tuple<Position, Board> Piece::standardMove(const Position& location, const Position& newLocation, const Board& boardInput) const{
+tuple<Position, Board> Piece::standardMove(const Position& location, 
+    const Position& newLocation, const Board& boardInput) const{
 
 
     Board tempBoard(boardInput);
 
-    tempBoard[location] = EmptySpace();
+    const Piece* empty = new EmptySpace();
+    
+    tempBoard.set(location, empty);
 
     // set the location the piece moves to as the piece.
-    tempBoard[newLocation] = boardInput[location];
+    tempBoard.set(newLocation, const_cast<Piece*>(&boardInput[location]) );
 
     // construct the output and return it.
-    return make_tuple(newLocation, boardInput);
+    return make_tuple(newLocation, tempBoard);
 }

@@ -29,7 +29,21 @@ public:
 
 	void drawBoard(const Interface& ui, const vector <Position>& possible);
 
+	bool inCheck(const Position location, bool blackAttacking) const;
+
 	ogstream* getGout();
+	
+	void set(const Position location, const Piece* newPiece) {
+		
+		set(location.getLocation(), newPiece);
+	}
+
+	void set(const int location, const Piece* newPiece) {
+
+		//delete board[location];
+
+		board[location] = const_cast<Piece*>(newPiece);
+	}
 
 	Board& operator=(const Board& other);
 
